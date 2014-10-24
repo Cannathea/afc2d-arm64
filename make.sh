@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-ver=$(git describe --tags --match="v*" "${flags[@]}" | sed -e 's@-\([^-]*\)-\([^-]*\)$@+\1.\2@;s@^v@@;s@%@~@g')
+ver=$(git describe --tags --dirty="+" --match="v*" "${flags[@]}" | sed -e 's@-\([^-]*\)-\([^-]*\)$@+\1.\2@;s@^v@@;s@%@~@g')
 sudo rm -rf _
 mkdir -p _/DEBIAN
 cycc -i2.0 -o_/DEBIAN/extrainst_ -- extrainst.mm -lz -framework Foundation
