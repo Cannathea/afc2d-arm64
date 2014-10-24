@@ -3,6 +3,11 @@ set -e
 ver=$(git describe --tags --dirty="+" --match="v*" "${flags[@]}" | sed -e 's@-\([^-]*\)-\([^-]*\)$@+\1.\2@;s@^v@@;s@%@~@g')
 sudo rm -rf _
 mkdir -p _/DEBIAN
+ms=_/Library/MobileSubstrate/DynamicLibraries
+mkdir -p "${ms}"
+cp -a afc2dService.plist "${ms}"
+plutil -convert binary1 "${ms}"/afc2dService.plist
+cycc -i2.0 -o"${ms}"/afc2dService.dylib -s afc2dService.mm -- -framework Foundation
 cycc -i2.0 -o_/DEBIAN/extrainst_ -- extrainst.mm -lz -framework Foundation
 cycc -i2.0 -o_/DEBIAN/postrm -- postrm.mm -lz -framework Foundation
 sed -e 's/\${ver}/'"${ver}"'/' control.in >_/DEBIAN/control

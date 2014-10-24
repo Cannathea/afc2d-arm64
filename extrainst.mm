@@ -87,19 +87,29 @@ int main(int argc, const char *argv[]) {
             return 1;
         }
 
-    NSString *path(@"/System/Library/Lockdown/Services.plist");
-    NSMutableDictionary *services([NSMutableDictionary dictionaryWithContentsOfFile:path]);
+    if (kCFCoreFoundationVersionNumber < 1000) {
+        NSString *path(@"/System/Library/Lockdown/Services.plist");
 
-    [services setObject:@{
-        @"AllowUnactivatedService": @true,
-        @"Label": @"com.apple.afc2",
-        @"ProgramArguments": @[@"/usr/libexec/afc2d", @"-S", @"-L", @"-d", @"/"],
-    } forKey:@"com.apple.afc2"];
+        NSMutableDictionary *services([NSMutableDictionary dictionaryWithContentsOfFile:path]);
+        if (services == nil) {
+            fprintf(stderr, "cannot read Services.plist\n");
+            return 1;
+        }
 
-    [services writeToFile:path atomically:YES];
+        [services setObject:@{
+            @"AllowUnactivatedService": @true,
+            @"Label": @"com.apple.afc2",
+            @"ProgramArguments": @[@"/usr/libexec/afc2d", @"-S", @"-L", @"-d", @"/"],
+        } forKey:@"com.apple.afc2"];
+
+        if (![services writeToFile:path atomically:YES]) {
+            fprintf(stderr, "cannot write Services.plist\n");
+            return 1;
+        }
+    }
+
     system("/bin/launchctl stop com.apple.mobile.lockdown");
 
     [pool release];
-
     return 0;
 }
