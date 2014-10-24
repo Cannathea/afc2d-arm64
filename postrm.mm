@@ -32,12 +32,13 @@ int main(int argc, const char *argv[]) {
     NSString *path(@"/System/Library/Lockdown/Services.plist");
     NSMutableDictionary *services([NSMutableDictionary dictionaryWithContentsOfFile:path]);
 
-    [services removeObjectForKey:@"com.apple.afc2"];
+    if (services != nil && [services objectForKey:@"com.apple.afc2"] != nil) {
+        [services removeObjectForKey:@"com.apple.afc2"];
+        [services writeToFile:path atomically:YES];
+    }
 
-    [services writeToFile:path atomically:YES];
     system("/bin/launchctl stop com.apple.mobile.lockdown");
 
     [pool release];
-
     return 0;
 }
