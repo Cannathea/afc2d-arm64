@@ -81,7 +81,7 @@ int main(int argc, const char *argv[]) {
 
     NSAutoreleasePool *pool([[NSAutoreleasePool alloc] init]);
 
-    if (kCFCoreFoundationVersionNumber >= 847.24)
+    if (kCFCoreFoundationVersionNumber >= 800)
         if (NSString *error = download()) {
             fprintf(stderr, "error: %s\n", [error UTF8String]);
             return 1;
