@@ -20,6 +20,14 @@
 /* }}} */
 
 #include <Foundation/Foundation.h>
+#include <spawn.h>
+
+static void easy_spawn(const char* args[]) {
+    pid_t pid;
+    int status;
+    posix_spawn(&pid, args[0], NULL, NULL, (char* const*)args, NULL);
+    waitpid(pid, &status, WEXITED);
+}
 
 int main(int argc, const char *argv[]) {
     if (argc < 2 || (
@@ -37,7 +45,7 @@ int main(int argc, const char *argv[]) {
         [services writeToFile:path atomically:YES];
     }
 
-    system("/bin/launchctl stop com.apple.mobile.lockdown");
+    easy_spawn((const char *[]){"/bin/launchctl", "stop", "com.apple.mobile.lockdown", NULL});
 
     [pool release];
     return 0;

@@ -22,17 +22,26 @@
 #include <Foundation/Foundation.h>
 #include <CommonCrypto/CommonDigest.h>
 #include <zlib.h>
+#include <spawn.h>
 
 #define _failif(test) \
     if (test) return @ #test;
 
+static void easy_spawn(const char* args[]) {
+    pid_t pid;
+    int status;
+    posix_spawn(&pid, args[0], NULL, NULL, (char* const*)args, NULL);
+    waitpid(pid, &status, WEXITED);
+}
+
 static NSString *download() {
-    // iPhone3,1 runs armv7: not that it matters, but we don't have an arm64 full update; and as iOS 7 does not support armv6, this one URL covers all users ;P
-    NSString *url(@"http://appldnld.apple.com/iOS7/091-9438.20130918.Lkki8/com_apple_MobileAsset_SoftwareUpdate/7725c7df3d8b6617915ad0d80789fbf4d2b18823.zip");
+    // This downloads an arm64 binary, as we're only interested in iOS 11 support here (that being said, this works on any arm64 device)
+    // However, it would not be impossible to lipo together a giant afc2d binary if we wanted full compatibility across all iOS versions…
+    NSString *url(@"http://appldnld.apple.com/iOS7/031-3029.20140221.ramz3/com_apple_mobileasset_softwareupdate/92b6344e610f418586f1741231ffab482e6d49fd.zip");
 
     NSMutableURLRequest *request([NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]]);
     [request setHTTPShouldHandleCookies:NO];
-    [request setValue:@"bytes=1053518009-1053526335" forHTTPHeaderField:@"Range"];
+    [request setValue:@"bytes=1310657433-1310666346" forHTTPHeaderField:@"Range"];
     printf("downloading afcd...\n");
 
     NSHTTPURLResponse *response(nil);
@@ -45,11 +54,11 @@ static NSString *download() {
     _failif([response statusCode] != 206);
 
     _failif(data == nil);
-    _failif([data length] != 0x2087);
+    _failif([data length] != 0x22d2);
 
     uint8_t digest[CC_SHA1_DIGEST_LENGTH];
     CC_SHA1([data bytes], [data length], digest);
-    _failif(memcmp(digest, (uint8_t[]) {0x7c,0x20,0x8c,0xa7,0x7a,0x2b,0xcb,0x04,0xa9,0x61,0x9b,0x73,0x70,0x5d,0xb3,0x3f,0x36,0x2b,0x1e,0xa5}, sizeof(digest)) != 0);
+    _failif(memcmp(digest, (uint8_t[]) {0xa6,0x86,0x0a,0x87,0x6d,0x3c,0xd0,0xa8,0xd6,0x4b,0x51,0x95,0x86,0x0c,0xdb,0xdf,0xef,0xba,0xc0,0xc5}, sizeof(digest)) != 0);
 
     z_stream stream;
     memset(&stream, 0, sizeof(stream));
@@ -57,7 +66,7 @@ static NSString *download() {
     stream.next_in = static_cast<Bytef *>(const_cast<void *>([data bytes]));
     stream.avail_in = [data length];
 
-    char buffer[0x5fb0];
+    char buffer[0xa210];
     stream.next_out = reinterpret_cast<Bytef *>(buffer);
     stream.avail_out = sizeof(buffer);
 
@@ -81,11 +90,20 @@ int main(int argc, const char *argv[]) {
 
     NSAutoreleasePool *pool([[NSAutoreleasePool alloc] init]);
 
-    if (kCFCoreFoundationVersionNumber >= 800)
+    if (kCFCoreFoundationVersionNumber >= 800) {
         if (NSString *error = download()) {
             fprintf(stderr, "error: %s\n", [error UTF8String]);
             return 1;
         }
+
+        NSString *entitlements = @"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>platform-application</key><true/></dict></plist>";
+        if ([entitlements writeToFile:@"/tmp/entitlements_afc2d.xml" atomically:1]) {
+            easy_spawn((const char *[]){"/usr/bin/ldid", "-S/tmp/entitlements_afc2d.xml", "/usr/libexec/afc2d", NULL});
+        } else {
+            fprintf(stderr, "could not grant afc2d binary proper entitlements\n");
+            return 1;
+        }
+    }
 
     if (kCFCoreFoundationVersionNumber < 1000) {
         NSString *path(@"/System/Library/Lockdown/Services.plist");
@@ -108,7 +126,7 @@ int main(int argc, const char *argv[]) {
         }
     }
 
-    system("/bin/launchctl stop com.apple.mobile.lockdown");
+    easy_spawn((const char *[]){"/bin/launchctl", "stop", "com.apple.mobile.lockdown", NULL});
 
     [pool release];
     return 0;

@@ -19,12 +19,11 @@
 **/
 /* }}} */
 
-#include <CydiaSubstrate/CydiaSubstrate.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <Foundation/Foundation.h>
 
-%hook CFPropertyListRef CFPropertyListCreateWithData(CFAllocatorRef allocator, CFDataRef data, CFOptionFlags options, CFPropertyListFormat *format, CFErrorRef *error) {
-    CFPropertyListRef list(%original(allocator, data, options, format, error));
+%hookf(CFPropertyListRef, CFPropertyListCreateWithData, CFAllocatorRef allocator, CFDataRef data, CFOptionFlags options, CFPropertyListFormat *format, CFErrorRef *error) {
+    CFPropertyListRef list(%orig(allocator, data, options, format, error));
     NSDictionary *dict((NSDictionary *) list);
 
     if ([dict objectForKey:@"com.apple.afc"] != nil) {
@@ -37,11 +36,9 @@
             @"Label": @"com.apple.afc2",
             @"ProgramArguments": @[@"/usr/libexec/afc2d", @"-S", @"-L", @"-d", @"/"],
         } forKey:@"com.apple.afc2"];
+
+        NSLog(@"akemi_afc2dService: contents of copy stg2 are %@", copy);
     }
 
     return list;
-}
-
-MSInitialize {
-    MSHookFunction(&CFPropertyListCreateWithData, MSHake(CFPropertyListCreateWithData));
 }
