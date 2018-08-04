@@ -26,7 +26,7 @@
     CFPropertyListRef list(%orig(allocator, data, options, format, error));
     NSDictionary *dict((NSDictionary *) list);
 
-    if ([dict objectForKey:@"com.apple.afc"] != nil) {
+    if ([dict isKindOfClass:[NSDictionary class]] && [dict objectForKey:@"com.apple.afc"] != nil) {
         NSMutableDictionary *copy([dict mutableCopy]);
         CFRelease(list);
         list = (CFPropertyListRef) copy;
@@ -36,8 +36,6 @@
             @"Label": @"com.apple.afc2",
             @"ProgramArguments": @[@"/usr/libexec/afc2d", @"-S", @"-L", @"-d", @"/"],
         } forKey:@"com.apple.afc2"];
-
-        NSLog(@"akemi_afc2dService: contents of copy stg2 are %@", copy);
     }
 
     return list;

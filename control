@@ -1,16 +1,16 @@
-Package: net.angelxwind.afc2d-arm64
-Name: Apple File Conduit "2" (arm64)
-Version: 1.3~akemi-test5
-Description: Allow full file-system access over USB for arm64 devices
+Package: com.cannathea.afc2d-arm64
+Name: Apple File Conduit "2" (arm64/KPPLess)
+Version: 1.0
+Description: Allow full file-system access over USB for arm64 devices, especially for those using a KPPLess jailbreak.
 Section: System
 Pre-Depends: dpkg (>= 1.14.25-8)
 Depends: cy+cpu.arm64, mobilesubstrate, ldid
-Conflicts: us.scw.afctwoadd, net.angelxwind.afc2ios70, afc2.25pp, afc2.25pp7, afc2.91, app.taig.afc2
-Replaces: us.scw.afctwoadd, net.angelxwind.afc2ios70, afc2.25pp, afc2.25pp7, afc2.91, app.taig.afc2
-Provides: us.scw.afctwoadd, net.angelxwind.afc2ios70, afc2.25pp, afc2.25pp7, afc2.91, app.taig.afc2
+Conflicts: com.saurik.afc2d, net.angelxwind.afc2d-arm64, com.mrmadtw.afc2forios11, repo.feng.afc2add11, us.scw.afctwoadd, net.angelxwind.afc2ios70, afc2.25pp, afc2.25pp7, afc2.91, app.taig.afc2
+Replaces: com.saurik.afc2d, net.angelxwind.afc2d-arm64, com.mrmadtw.afc2forios11, repo.feng.afc2add11, us.scw.afctwoadd, net.angelxwind.afc2ios70, afc2.25pp, afc2.25pp7, afc2.91, app.taig.afc2
+Provides: com.saurik.afc2d, net.angelxwind.afc2d-arm64, com.mrmadtw.afc2forios11, repo.feng.afc2add11, us.scw.afctwoadd, net.angelxwind.afc2ios70, afc2.25pp, afc2.25pp7, afc2.91, app.taig.afc2
 Architecture: iphoneos-arm
-Author: saurik, Karen/あけみ <karen@angelxwind.net>
-Homepage: https://cydia.angelxwind.net/
-Depiction: https://cydia.angelxwind.net/?page/net.angelxwind.afc2d-arm64
-Maintainer: Karen/あけみ (angelXwind) <karen@angelxwind.net>
+Author: saurik, Cannathea <csupport@cannathea.com>
+Homepage: https://cannathea.com/
+Depiction: https://cydia.angelxwind.net/?page/com.cannathea.afc2d-arm64
+Maintainer: Cannathea <csupport@cannathea.com>
 Tag: purpose::daemon, role::enduser
