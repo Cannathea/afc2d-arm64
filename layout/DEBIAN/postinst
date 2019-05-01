@@ -1,0 +1,4 @@
+#!/bin/sh
+chown root:wheel /usr/bin/killdaemon
+chmod 6755 /usr/bin/killdaemon
+exit 0

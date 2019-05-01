@@ -41,15 +41,11 @@ int main(int argc, const char **argv) {
         
         if ((chdir("/")) < 0) {
             printf("ERROR: Not run as root.\n");
-            return 1;
-        }
-        
-        if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 &&
-            [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
+        } else if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 &&
+                   [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
             easy_spawn((const char *[]){"/usr/bin/killall", "-9", "lockdownd", NULL});
             easy_spawn((const char *[]){"/usr/bin/killall", "-9", "mDNSResponder", NULL});
         }
-        
     }
     return 0;
 }

@@ -1,6 +1,6 @@
 Package: com.cannathea.afc2d-arm64
 Name: Apple File Conduit "2" (arm64/KPPLess)
-Version: 1.0.2
+Version: 1.0.3
 Description: Allow full file-system access over USB for arm64 devices, especially for those using a KPPLess jailbreak.
 Section: System
 Pre-Depends: dpkg (>= 1.14.25-8)
