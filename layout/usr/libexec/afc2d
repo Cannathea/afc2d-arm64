@@ -1,2 +1,3 @@
 #!/bin/bash
 exec /usr/libexec/afcd "$@"
+layout/usr/libexec/afc2d
