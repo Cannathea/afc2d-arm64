@@ -10,3 +10,5 @@ _/*
 */obj/*
 **/obj/*
 *.zip
+layout/DEBIAN/extrainst_
+layout/DEBIAN/postrm

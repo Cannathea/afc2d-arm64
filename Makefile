@@ -14,12 +14,12 @@ TOOL_NAME = postrm extrainst_ killdaemon
 
 postrm_FILES = postrm.mm
 postrm_FRAMEWORKS = Foundation
-postrm_INSTALL_PATH = /DEBIAN
+postrm_INSTALL_PATH = /tmp
 postrm_CODESIGN_FLAGS = -Sentitlements.xml
 
 extrainst__FILES = extrainst.mm
 extrainst__FRAMEWORKS = Foundation
-extrainst__INSTALL_PATH = /DEBIAN
+extrainst__INSTALL_PATH = /tmp
 extrainst__LIBRARIES = z
 extrainst__CODESIGN_FLAGS = -Sentitlements.xml
 
@@ -36,6 +36,11 @@ afc2dService_LIBRARIES = substrate
 afc2dSupport_FILES = Tweak.xm
 
 include $(THEOS_MAKE_PATH)/tweak.mk
+
+after-stage::
+	mv -f $(THEOS_STAGING_DIR)/tmp/postrm ./layout/DEBIAN/postrm
+	mv -f $(THEOS_STAGING_DIR)/tmp/extrainst_ ./layout/DEBIAN/extrainst_
+	rm -Rf $(THEOS_STAGING_DIR)/tmp
 
 before-package::
 	sudo chown -R root:wheel $(THEOS_STAGING_DIR)
