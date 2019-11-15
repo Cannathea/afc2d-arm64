@@ -1,7 +1,7 @@
-Apple File Conduit "2" (arm64/KPPLess)
-======================================
+Apple File Conduit "2" (iOS 11+, arm64)
+=======================================
 
-**Works on any arm64 device, including those using KPPLess jailbreaks (Electra, Meridian, etc.)**
+**Works on any arm64 device running iOS 11, 12, and 13.**
 
 This is a modified version of saurik's original AFC2 code that downloads and installs an arm64 copy of afcd (required on iOS 11 and above) straight from Apple, and then automatically grants it the necessary `platform-application` entitlement required for functionality on KPPLess jailbreaks (like Electra and Meridian).
 

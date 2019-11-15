@@ -46,7 +46,7 @@ int main(int argc, const char *argv[]) {
         [services writeToFile:path atomically:YES];
     }
 
-    easy_spawn((const char *[]){"/bin/launchctl", "stop", "com.apple.mobile.lockdown", NULL});
+    easy_spawn((const char *[]){(access("/sbin/launchctl", X_OK) != -1) ? "/sbin/launchctl" : "/bin/launchctl", "stop", "com.apple.mobile.lockdown", NULL});
 
     [pool release];
     return 0;

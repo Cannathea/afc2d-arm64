@@ -1,7 +1,7 @@
 Package: com.cannathea.afc2d-arm64
-Name: Apple File Conduit "2" (arm64/KPPLess)
-Version: 1.0.3
-Description: Allow full file-system access over USB for arm64 devices, especially for those using a KPPLess jailbreak.
+Name: Apple File Conduit "2" (iOS 11+, arm64)
+Version: 1.1
+Description: Allow full file-system access over USB for all arm64 devices, especially useful for those on iOS 11 and above.
 Section: System
 Pre-Depends: dpkg (>= 1.14.25-8)
 Depends: cy+cpu.arm64, mobilesubstrate, ldid
@@ -11,6 +11,6 @@ Provides: com.saurik.afc2d, net.angelxwind.afc2d-arm64, com.mrmadtw.afc2forios11
 Architecture: iphoneos-arm
 Author: saurik, Cannathea <csupport@cannathea.com>
 Homepage: https://cannathea.com/
-Depiction: https://cydia.angelxwind.net/?page/com.cannathea.afc2d-arm64
+Depiction: https://cydia.akemi.ai/?page/com.cannathea.afc2d-arm64
 Maintainer: Cannathea <csupport@cannathea.com>
 Tag: purpose::daemon, role::enduser
