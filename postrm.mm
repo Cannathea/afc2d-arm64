@@ -21,14 +21,7 @@
 /* }}} */
 
 #include <Foundation/Foundation.h>
-#include <spawn.h>
-
-static void easy_spawn(const char* args[]) {
-    pid_t pid;
-    int status;
-    posix_spawn(&pid, args[0], NULL, NULL, (char* const*)args, NULL);
-    waitpid(pid, &status, WEXITED);
-}
+#import "easy_spawn.h"
 
 int main(int argc, const char *argv[]) {
     if (argc < 2 || (

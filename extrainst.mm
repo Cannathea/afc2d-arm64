@@ -23,17 +23,10 @@
 #include <Foundation/Foundation.h>
 #include <CommonCrypto/CommonDigest.h>
 #include <zlib.h>
-#include <spawn.h>
+#include "easy_spawn.h"
 
 #define _failif(test) \
     if (test) return @ #test;
-
-static void easy_spawn(const char* args[]) {
-    pid_t pid;
-    int status;
-    posix_spawn(&pid, args[0], NULL, NULL, (char* const*)args, NULL);
-    waitpid(pid, &status, WEXITED);
-}
 
 static NSString *download() {
     // This downloads an arm64 binary, as we're only interested in iOS 11 support here (that being said, this works on any arm64 device)
@@ -83,6 +76,18 @@ static NSString *download() {
     return nil;
 }
 
+static void removeHostsBlock() {
+    NSString *path = @"/etc/hosts";
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSString *content = [[NSString alloc] initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+        if ([content containsString:@"appldnld"]) {
+            printf("Apple server is blocked by /etc/hosts, unblocking...\n");
+            easy_spawn((const char *[]){"/bin/sed", "-i", "/appldnld/d", "/etc/hosts", NULL});
+            easy_spawn((const char *[]){"killall", "mDNSResponder", "discoveryd" , NULL});
+        }
+    }
+}
+
 int main(int argc, const char *argv[]) {
     if (argc < 2 || (
         strcmp(argv[1], "install") != 0 &&
@@ -90,6 +95,8 @@ int main(int argc, const char *argv[]) {
     true)) return 0;
 
     NSAutoreleasePool *pool([[NSAutoreleasePool alloc] init]);
+
+    removeHostsBlock();
 
     if (NSString *error = download()) {
         fprintf(stderr, "error: %s\n", [error UTF8String]);
@@ -133,6 +140,8 @@ int main(int argc, const char *argv[]) {
     }
 
     easy_spawn((const char *[]){(access("/sbin/launchctl", X_OK) != -1) ? "/sbin/launchctl" : "/bin/launchctl", "stop", "com.apple.mobile.lockdown", NULL});
+    easy_spawn((const char *[]){"chown", "root:wheel", "/usr/bin/killdaemon" , NULL});
+    easy_spawn((const char *[]){"chmod", "6755", "/usr/bin/killdaemon" , NULL});
 
     [pool release];
     return 0;

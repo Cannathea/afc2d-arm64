@@ -20,26 +20,23 @@
  **/
 /* }}} */
 
-#import <spawn.h>
+#import "easy_spawn.h"
 
 #ifndef kCFCoreFoundationVersionNumber_iOS_12_0
 #define kCFCoreFoundationVersionNumber_iOS_12_0 1556.00
 #endif
 
-static void easy_spawn(const char* args[]) {
-    pid_t pid;
-    int status;
-    posix_spawn(&pid, args[0], NULL, NULL, (char* const*)args, NULL);
-    waitpid(pid, &status, WEXITED);
-}
-
-%hook SpringBoard
+%group SpringBoardHook %hook SpringBoard
 - (void)applicationDidFinishLaunching:(id)arg1
 {
     %orig;
+    easy_spawn((const char *[]){"/usr/bin/killdaemon", NULL});
+}
+%end %end
+
+%ctor {
     if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 &&
         [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
-        easy_spawn((const char *[]){"/usr/bin/killdaemon", NULL});
+        %init(SpringBoardHook);
     }
 }
-%end

@@ -1,7 +1,0 @@
-#!/bin/sh
-
-sed -i -e '/appldnld/d' /etc/hosts
-
-killall mDNSResponder discoveryd
-
-exit 0
