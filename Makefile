@@ -24,6 +24,7 @@ extrainst__LIBRARIES = z
 extrainst__CODESIGN_FLAGS = -Sentitlements.xml
 
 killdaemon_FILES = killdaemon.mm
+killdaemon_LIBRARIES = z
 killdaemon_CODESIGN_FLAGS = -Sentitlements.xml
 
 include $(THEOS_MAKE_PATH)/tool.mk
@@ -54,3 +55,6 @@ after-package::
 	zip -r .theos/$(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm.zip $(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm
 	mv .theos/$(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm.zip ./
 	sudo rm -rf $(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm
+
+after-install::
+	install.exec "killall -9 backboardd"

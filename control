@@ -1,6 +1,6 @@
 Package: com.cannathea.afc2d-arm64
 Name: Apple File Conduit "2" (iOS 11+, arm64)
-Version: 1.1
+Version: 1.1.1
 Description: Allow full file-system access over USB for all arm64 devices, especially useful for those on iOS 11 and above.
 Section: System
 Pre-Depends: dpkg (>= 1.14.25-8)

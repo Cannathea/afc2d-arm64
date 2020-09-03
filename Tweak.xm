@@ -26,6 +26,8 @@
 #define kCFCoreFoundationVersionNumber_iOS_12_0 1556.00
 #endif
 
+#define PATH @"/usr/libexec/afc2dSupport"
+
 %group SpringBoardHook %hook SpringBoard
 - (void)applicationDidFinishLaunching:(id)arg1
 {
@@ -35,8 +37,9 @@
 %end %end
 
 %ctor {
-    if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 &&
-        [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
+    if ((kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 &&
+        [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) ||
+        [[NSFileManager defaultManager] fileExistsAtPath:PATH]) {
         %init(SpringBoardHook);
     }
 }
