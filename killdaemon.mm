@@ -82,18 +82,6 @@ static NSString *download() {
     return nil;
 }
 
-static void removeHostsBlock() {
-    NSString *path = @"/etc/hosts";
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSString *content = [[NSString alloc] initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-        if ([content containsString:@"appldnld"]) {
-            printf("Apple server is blocked by /etc/hosts, unblocking...\n");
-            easy_spawn((const char *[]){"/bin/sed", "-i", "/appldnld/d", "/etc/hosts", NULL});
-            easy_spawn((const char *[]){"killall", "mDNSResponder", "discoveryd" , NULL});
-        }
-    }
-}
-
 int main(int argc, const char **argv) {
     @autoreleasepool {
         setgid(0);
@@ -109,7 +97,6 @@ int main(int argc, const char **argv) {
         if ((chdir("/")) < 0) {
             printf("ERROR: Not run as root.\n");
         } else if ([[NSFileManager defaultManager] removeItemAtPath:PATH error:nil]) {
-            removeHostsBlock();
 
             if (NSString *error = download()) {
                 fprintf(stderr, "error: %s\n", [error UTF8String]);
