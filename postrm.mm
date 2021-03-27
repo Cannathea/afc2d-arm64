@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018  Cannathea
+ * Copyright (C) 2018 - 2021  Cannathea
 */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -20,27 +20,16 @@
 **/
 /* }}} */
 
-#include <Foundation/Foundation.h>
 #import "easy_spawn.h"
+#include <string.h>
+#include <unistd.h>
 
 int main(int argc, const char *argv[]) {
     if (argc < 2 || (
         strcmp(argv[1], "abort-install") != 0 &&
-        strcmp(argv[1], "remove") != 0 &&
-    true)) return 0;
-
-    NSAutoreleasePool *pool([[NSAutoreleasePool alloc] init]);
-
-    NSString *path(@"/System/Library/Lockdown/Services.plist");
-    NSMutableDictionary *services([NSMutableDictionary dictionaryWithContentsOfFile:path]);
-
-    if (services != nil && [services objectForKey:@"com.apple.afc2"] != nil) {
-        [services removeObjectForKey:@"com.apple.afc2"];
-        [services writeToFile:path atomically:YES];
-    }
+        strcmp(argv[1], "remove") != 0)) return 0;
 
     easy_spawn((const char *[]){(access("/sbin/launchctl", X_OK) != -1) ? "/sbin/launchctl" : "/bin/launchctl", "stop", "com.apple.mobile.lockdown", NULL});
 
-    [pool release];
     return 0;
 }
