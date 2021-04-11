@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018 - 2019  Cannathea
+ * Copyright (C) 2018 - 2021  Cannathea
  */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -21,10 +21,7 @@
 /* }}} */
 
 #import "easy_spawn.h"
-
-#ifndef kCFCoreFoundationVersionNumber_iOS_12_0
-#define kCFCoreFoundationVersionNumber_iOS_12_0 1556.00
-#endif
+#import <Foundation/Foundation.h>
 
 #define PATH @"/usr/libexec/afc2dSupport"
 
@@ -37,8 +34,7 @@
 %end %end
 
 %ctor {
-    if ((kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 &&
-        [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) ||
+    if (([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) ||
         [[NSFileManager defaultManager] fileExistsAtPath:PATH]) {
         %init(SpringBoardHook);
     }

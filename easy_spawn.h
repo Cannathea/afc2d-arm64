@@ -1,4 +1,5 @@
 #import <spawn.h>
+#include <sys/wait.h>
 
 static void easy_spawn(const char* args[]) {
     pid_t pid;

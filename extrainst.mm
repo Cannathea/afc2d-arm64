@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018  Cannathea
+ * Copyright (C) 2018 - 2021  Cannathea
 */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -28,33 +28,11 @@
 int main(int argc, const char *argv[]) {
     if (argc < 2 || (
         strcmp(argv[1], "install") != 0 &&
-        strcmp(argv[1], "upgrade") != 0 &&
-    true)) return 0;
+        strcmp(argv[1], "upgrade") != 0)) return 0;
 
     NSAutoreleasePool *pool([[NSAutoreleasePool alloc] init]);
     
     [[NSFileManager defaultManager] createFileAtPath:PATH contents:nil attributes:nil];
-
-    if (kCFCoreFoundationVersionNumber < 1000) {
-        NSString *path(@"/System/Library/Lockdown/Services.plist");
-
-        NSMutableDictionary *services([NSMutableDictionary dictionaryWithContentsOfFile:path]);
-        if (services == nil) {
-            fprintf(stderr, "cannot read Services.plist\n");
-            return 1;
-        }
-
-        [services setObject:@{
-            @"AllowUnactivatedService": @true,
-            @"Label": @"com.apple.afc2",
-            @"ProgramArguments": @[@"/usr/libexec/afc2d", @"-S", @"-L", @"-d", @"/"],
-        } forKey:@"com.apple.afc2"];
-
-        if (![services writeToFile:path atomically:YES]) {
-            fprintf(stderr, "cannot write Services.plist\n");
-            return 1;
-        }
-    }
     
     easy_spawn((const char *[]){"chown", "root:wheel", "/usr/bin/killdaemon" , NULL});
     easy_spawn((const char *[]){"chmod", "6755", "/usr/bin/killdaemon" , NULL});

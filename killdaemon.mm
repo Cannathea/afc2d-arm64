@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018 - 2019  Cannathea
+ * Copyright (C) 2018 - 2021  Cannathea
  */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -23,11 +23,8 @@
 #import <Foundation/Foundation.h>
 #include <CommonCrypto/CommonDigest.h>
 #include <zlib.h>
+#import <version.h>
 #import "easy_spawn.h"
-
-#ifndef kCFCoreFoundationVersionNumber_iOS_12_0
-#define kCFCoreFoundationVersionNumber_iOS_12_0 1556.00
-#endif
 
 #define PATH @"/usr/libexec/afc2dSupport"
 
@@ -89,7 +86,7 @@ int main(int argc, const char **argv) {
         
         if ((chdir("/")) < 0) {
             printf("ERROR: Not run as root.\n");
-        } else if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_12_0 &&
+        } else if (IS_IOS_OR_NEWER(iOS_12_0) &&
                    [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
             easy_spawn((const char *[]){"/usr/bin/killall", "-9", "lockdownd", NULL});
         }
