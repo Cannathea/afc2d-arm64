@@ -46,7 +46,6 @@ after-stage::
 before-package::
 	sudo chown -R root:wheel $(THEOS_STAGING_DIR)
 	sudo chmod -R 755 $(THEOS_STAGING_DIR)
-	sudo chmod 6755 $(THEOS_STAGING_DIR)/usr/bin/killdaemon
 	sudo chmod 666 $(THEOS_STAGING_DIR)/DEBIAN/control
 
 after-package::

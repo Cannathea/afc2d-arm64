@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ $1 == install || update ]]; then
+    chown root:wheel /usr/bin/killdaemon
+    chmod 6755 /usr/bin/killdaemon
+fi
+
+exit 0
