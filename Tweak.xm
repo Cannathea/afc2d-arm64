@@ -34,8 +34,7 @@
 %end %end
 
 %ctor {
-    if (([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) ||
-        [[NSFileManager defaultManager] fileExistsAtPath:PATH]) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:PATH]) {
         %init(SpringBoardHook);
     }
 }

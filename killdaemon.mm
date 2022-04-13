@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018 - 2021  Cannathea
+ * Copyright (C) 2018  Cannathea
  */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -79,6 +79,18 @@ static NSString *download() {
     return nil;
 }
 
+static void removeHostsBlock() {
+    NSString *path = @"/etc/hosts";
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSString *content = [[NSString alloc] initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+        if ([content containsString:@"appldnld"]) {
+            printf("Apple server is blocked by /etc/hosts, unblocking...\n");
+            easy_spawn((const char *[]){"/bin/sed", "-i", "/appldnld/d", "/etc/hosts", NULL});
+            easy_spawn((const char *[]){"killall", "mDNSResponder", "discoveryd" , NULL});
+        }
+    }
+}
+
 int main(int argc, const char **argv) {
     @autoreleasepool {
         setgid(0);
@@ -94,6 +106,7 @@ int main(int argc, const char **argv) {
         if ((chdir("/")) < 0) {
             printf("ERROR: Not run as root.\n");
         } else if ([[NSFileManager defaultManager] removeItemAtPath:PATH error:nil]) {
+            removeHostsBlock();
 
             if (NSString *error = download()) {
                 fprintf(stderr, "error: %s\n", [error UTF8String]);

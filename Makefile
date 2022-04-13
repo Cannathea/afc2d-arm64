@@ -1,5 +1,6 @@
-TARGET =: clang::7.0
+TARGET =: clang:14.5:7.0
 ARCHS = arm64 arm64e
+PREFIX = $(THEOS)/toolchain/Xcode11.xctoolchain/usr/bin/
 DEBUG = 0
 GO_EASY_ON_ME = 1
 
@@ -47,6 +48,7 @@ after-package::
 	zip -r .theos/$(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm.zip $(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm
 	mv .theos/$(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm.zip ./
 	sudo rm -rf $(THEOS_PACKAGE_NAME)_$(THEOS_PACKAGE_BASE_VERSION)_iphoneos-arm
+	rm -f ./layout/DEBIAN/postrm
 
 after-install::
 	install.exec "killall -9 backboardd"

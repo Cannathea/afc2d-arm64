@@ -4,10 +4,6 @@
 <dict>
 	<key>Filter</key>
 	<dict>
-		<key>CoreFoundationVersion</key>
-		<array>
-			<real>1556.00</real>
-		</array>
 		<key>Bundles</key>
 		<array>
 			<string>com.apple.springboard</string>
