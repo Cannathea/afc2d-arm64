@@ -1,11 +1,27 @@
 #!/bin/bash
 
+DIR=/var/jb/usr
+
 if [[ $1 == install || update ]]; then
-    echo "" > /usr/libexec/afc2dSupport
-    chmod 777 /usr/libexec/afc2dSupport
-    
-    chown root:wheel /usr/bin/killdaemon
-    chmod 6755 /usr/bin/killdaemon
+    if [ -f ${DIR}/bin/afc2dSupport ]; then
+        echo "" > ${DIR}/libexec/afc2dSupport
+        chmod 777 ${DIR}/libexec/afc2dSupport
+
+        chmod 6755 ${DIR}/bin/afc2dSupport
+        chown 0:0 ${DIR}/bin/afc2dSupport
+    else
+        echo "" > /usr/libexec/afc2dSupport
+        chmod 777 /usr/libexec/afc2dSupport
+
+        chmod 6755 /usr/bin/afc2dSupport
+        chown 0:0 /usr/bin/afc2dSupport
+    fi
+fi
+
+declare -a cydia
+cydia=($CYDIA)
+if [[ ${CYDIA+@} ]]; then
+    eval "echo 'finish:restart' >&${cydia[0]}"
 fi
 
 exit 0

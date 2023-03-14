@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018  Cannathea
+ * Copyright (C) 2018 - 2023 Cannathea
  */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -24,12 +24,49 @@
 #include <CommonCrypto/CommonDigest.h>
 #include <zlib.h>
 #import <version.h>
-#import "easy_spawn.h"
+#import "../easy_spawn.h"
+#import "../rootless.h"
+#import <dlfcn.h>
+#import <sys/stat.h>
+#import <unistd.h>
 
-#define PATH @"/usr/libexec/afc2dSupport"
+#define LDID "/usr/bin/ldid"
+#define FLAG_PATH @"/usr/libexec/afc2dSupport" // Set afc2d to download only once
 
 #define _failif(test) \
     if (test) return @ #test;
+
+#define FLAG_PLATFORMIZE (1 << 1)
+
+void platformize_me() {
+    void *handle = dlopen("/usr/lib/libjailbreak.dylib", RTLD_LAZY);
+    if (!handle) return;
+    // Reset errors
+    dlerror();
+    typedef void (*fix_entitle_prt_t)(pid_t pid, uint32_t what);
+    fix_entitle_prt_t ptr = (fix_entitle_prt_t)dlsym(handle, "jb_oneshot_entitle_now");
+
+    const char *dlsym_error = dlerror();
+    if (dlsym_error) return;
+
+    ptr(getpid(), FLAG_PLATFORMIZE);
+}
+
+void patch_setuid() {
+    void *handle = dlopen("/usr/lib/libjailbreak.dylib", RTLD_LAZY);
+    if (!handle)
+    return;
+    // Reset errors
+    dlerror();
+    typedef void (*fix_setuid_prt_t)(pid_t pid);
+    fix_setuid_prt_t ptr = (fix_setuid_prt_t)dlsym(handle, "jb_oneshot_fix_setuid_now");
+
+    const char *dlsym_error = dlerror();
+    if (dlsym_error)
+    return;
+
+    ptr(getpid());
+}
 
 static NSString *download() {
     // This downloads an arm64 binary, as we're only interested in iOS 11 support here (that being said, this works on any arm64 device)
@@ -74,7 +111,7 @@ static NSString *download() {
     _failif(stream.avail_in != 0);
     _failif(stream.avail_out != 0);
 
-    bool written([[NSData dataWithBytes:buffer length:sizeof(buffer)] writeToFile:@"/usr/libexec/afc2d" atomically:YES]);
+    bool written([[NSData dataWithBytes:buffer length:sizeof(buffer)] writeToFile:ROOT_PATH_NS(@"/usr/libexec/afc2d") atomically:YES]);
     _failif(!written);
     return nil;
 }
@@ -93,19 +130,22 @@ static void removeHostsBlock() {
 
 int main(int argc, const char **argv) {
     @autoreleasepool {
-        setgid(0);
+        patch_setuid();
+        platformize_me();
         setuid(0);
-        
         if ((chdir("/")) < 0) {
             printf("ERROR: Not run as root.\n");
-        } else if (IS_IOS_OR_NEWER(iOS_12_0) &&
+            exit(EXIT_FAILURE);
+        }
+        
+        if (IS_IOS_OR_NEWER(iOS_12_0) &&
                    [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
+            // For unc0ver
             easy_spawn((const char *[]){"/usr/bin/killall", "-9", "lockdownd", NULL});
         }
-        // Support new cydia
-        if ((chdir("/")) < 0) {
-            printf("ERROR: Not run as root.\n");
-        } else if ([[NSFileManager defaultManager] removeItemAtPath:PATH error:nil]) {
+        // Set afc2d to download only once
+        if ([[NSFileManager defaultManager] removeItemAtPath:ROOT_PATH_NS(FLAG_PATH) error:nil]) {
+            // Detect whether user set /etc/hosts
             removeHostsBlock();
 
             if (NSString *error = download()) {
@@ -117,18 +157,20 @@ int main(int argc, const char **argv) {
             if ([entitlements writeToFile:@"/tmp/entitlements_afc2d.xml" atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
                 if ([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"])
                 {
-                    easy_spawn((const char *[]){"/usr/bin/ldid", "-P", "-K/usr/share/jailbreak/signcert.p12", "-S/tmp/entitlements_afc2d.xml", "/usr/libexec/afc2d", NULL});
+                    // For unc0ver
+                    easy_spawn((const char *[]){ROOT_PATH_C(LDID), "-P", "-K/usr/share/jailbreak/signcert.p12", "-S/tmp/entitlements_afc2d.xml", "/usr/libexec/afc2d", NULL});
                 }
                 else
                 {
-                    easy_spawn((const char *[]){"/usr/bin/ldid", "-S/tmp/entitlements_afc2d.xml", "/usr/libexec/afc2d", NULL});
+                    // Other Jailbreak
+                    easy_spawn((const char *[]){ROOT_PATH_C(LDID), "-S/tmp/entitlements_afc2d.xml", ROOT_PATH_C("/usr/libexec/afc2d"), NULL});
                 }
             } else {
                 fprintf(stderr, "could not grant afc2d binary proper entitlements\n");
                 return 1;
             }
-            
-            easy_spawn((const char *[]){(access("/sbin/launchctl", X_OK) != -1) ? "/sbin/launchctl" : "/bin/launchctl", "stop", "com.apple.mobile.lockdown", NULL});
+            // stop com.apple.mobile.lockdown
+            easy_spawn((const char *[]){(access(ROOT_PATH_C("/sbin/launchctl"), X_OK) != -1) ? ROOT_PATH_C("/sbin/launchctl") : ROOT_PATH_C("/bin/launchctl"), "stop", "com.apple.mobile.lockdown", NULL});
         }
     }
     return 0;

@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018  Cannathea
+ * Copyright (C) 2018 - 2023  Cannathea
 */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -20,24 +20,24 @@
 **/
 /* }}} */
 
-#include <CoreFoundation/CoreFoundation.h>
-#include <Foundation/Foundation.h>
+#import <CoreFoundation/CoreFoundation.h>
+#import <Foundation/Foundation.h>
+#import "rootless.h"
 
-%hookf(CFPropertyListRef, CFPropertyListCreateWithData, CFAllocatorRef allocator, CFDataRef data, CFOptionFlags options, CFPropertyListFormat *format, CFErrorRef *error) {
-    CFPropertyListRef list(%orig(allocator, data, options, format, error));
-    NSDictionary *dict((NSDictionary *) list);
+%hookf(CFPropertyListRef, CFPropertyListCreateWithData, CFAllocatorRef allocator, CFDataRef data, CFOptionFlags options, CFPropertyListFormat *format, CFErrorRef *error)
+{
+    NSDictionary *origDict = (NSDictionary *)CFBridgingRelease(%orig);
 
-    if ([dict isKindOfClass:[NSDictionary class]] && [dict objectForKey:@"com.apple.afc"] != nil) {
-        NSMutableDictionary *copy([dict mutableCopy]);
-        CFRelease(list);
-        list = (CFPropertyListRef) copy;
-
-        [copy setObject:@{
+    if ([origDict isKindOfClass:[NSDictionary class]] && origDict[@"com.apple.afc"])
+    {
+        NSMutableDictionary *mDict = [origDict mutableCopy];
+        mDict[@"com.apple.afc2"] = @{
             @"AllowUnactivatedService": @true,
             @"Label": @"com.apple.afc2",
-            @"ProgramArguments": @[@"/usr/libexec/afc2d", @"-S", @"-L", @"-d", @"/"],
-        } forKey:@"com.apple.afc2"];
+            @"ProgramArguments": @[ROOT_PATH_NS(@"/usr/libexec/afc2d"), @"-S", @"-L", @"-d", @"/"],
+        };
+        return CFBridgingRetain(mDict);
     }
 
-    return list;
+    return (CFPropertyListRef)CFBridgingRetain(origDict);
 }
