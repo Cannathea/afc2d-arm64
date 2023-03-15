@@ -54,8 +54,7 @@ void platformize_me() {
 
 void patch_setuid() {
     void *handle = dlopen("/usr/lib/libjailbreak.dylib", RTLD_LAZY);
-    if (!handle)
-    return;
+    if (!handle) return;
     // Reset errors
     dlerror();
     typedef void (*fix_setuid_prt_t)(pid_t pid);
