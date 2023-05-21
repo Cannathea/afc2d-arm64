@@ -1,9 +1,0 @@
-Package: com.cannathea.afc2dsupport
-Name: afc2dSupport
-Version: 0.0.1
-Architecture: iphoneos-arm
-Description: An awesome tool of some sort!!
-Maintainer: ichitaso
-Author: ichitaso
-Section: System
-Tag: role::hacker

@@ -28,31 +28,24 @@
 #define LDID @"/usr/bin/ldid"
 #define FLAG_PATH @"/usr/libexec/afc2dSupport" // Set afc2d to download only once
 
-%group SpringBoardHook
 %hook SpringBoard
 - (void)applicationDidFinishLaunching:(id)arg1 {
     %orig;
 
-    if (![[NSFileManager defaultManager] fileExistsAtPath:ROOT_PATH_NS(LDID)]) {
-        // Alert of confirmation because ldid cannot be put in depends in control file for XinaA15.
-        UIAlertController *alert =
-        [UIAlertController alertControllerWithTitle:@"ldid is required"
-                                            message:@"Please Respring after installation."
-                                     preferredStyle:UIAlertControllerStyleAlert];
-
-        [alert addAction:[UIAlertAction actionWithTitle:@"Okay" style:UIAlertActionStyleCancel handler:nil]];
-
-        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
-    } else {
-        easy_spawn((const char *[]){ROOT_PATH_C("/usr/bin/afc2dSupport"), NULL});
-    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
+        if (![[NSFileManager defaultManager] fileExistsAtPath:ROOT_PATH_NS(LDID)]) {
+            // Alert of confirmation because ldid cannot be put in depends in control file for XinaA15.
+            UIAlertController *alert =
+            [UIAlertController alertControllerWithTitle:@"ldid is required"
+                                                message:@"Please Respring after installation."
+                                         preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Okay" style:UIAlertActionStyleCancel handler:nil]];
+            
+            [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        } else if ([[NSFileManager defaultManager] fileExistsAtPath:ROOT_PATH_NS(FLAG_PATH)]) {
+            easy_spawn((const char *[]){ROOT_PATH_C("/usr/bin/afc2dSupport"), NULL});
+        }
+    });
 }
 %end
-%end
-
-%ctor {
-    // Set afc2d to download only once
-    if ([[NSFileManager defaultManager] fileExistsAtPath:ROOT_PATH_NS(FLAG_PATH)]) {
-        %init(SpringBoardHook);
-    }
-}
