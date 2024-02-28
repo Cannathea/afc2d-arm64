@@ -2,7 +2,7 @@
 
 export PREFIX=$THEOS/toolchain/Xcode11.xctoolchain/usr/bin/
 make clean
-make package install
+make package
 
 export -n PREFIX
 make clean

@@ -1,27 +1,3 @@
 #!/bin/bash
-
-DIR=/var/jb/usr
-
-if [[ $1 == install || update ]]; then
-    if [ -f ${DIR}/bin/afc2dSupport ]; then
-        echo "" > ${DIR}/libexec/afc2dSupport
-        chmod 777 ${DIR}/libexec/afc2dSupport
-
-        chmod 6755 ${DIR}/bin/afc2dSupport
-        chown 0:0 ${DIR}/bin/afc2dSupport
-    else
-        echo "" > /usr/libexec/afc2dSupport
-        chmod 777 /usr/libexec/afc2dSupport
-
-        chmod 6755 /usr/bin/afc2dSupport
-        chown 0:0 /usr/bin/afc2dSupport
-    fi
-fi
-
-declare -a cydia
-cydia=($CYDIA)
-if [[ ${CYDIA+@} ]]; then
-    eval "echo 'finish:restart' >&${cydia[0]}"
-fi
-
+launchctl kill 9 system/com.apple.mobile.lockdown
 exit 0

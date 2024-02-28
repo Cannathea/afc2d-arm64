@@ -1,6 +1,6 @@
 /* AFC2 - the original definition of "jailbreak"
  * Copyright (C) 2014  Jay Freeman (saurik)
- * Copyright (C) 2018 - 2023  Cannathea
+ * Copyright (C) 2018  Cannathea
 */
 
 /* GNU General Public License, Version 3 {{{ */
@@ -22,7 +22,7 @@
 
 #import <CoreFoundation/CoreFoundation.h>
 #import <Foundation/Foundation.h>
-#import "rootless.h"
+#import <rootless.h>
 
 %hookf(CFPropertyListRef, CFPropertyListCreateWithData, CFAllocatorRef allocator, CFDataRef data, CFOptionFlags options, CFPropertyListFormat *format, CFErrorRef *error)
 {

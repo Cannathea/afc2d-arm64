@@ -4,10 +4,4 @@ launchctl kill 9 system/com.apple.mobile.lockdown
 
 rm -f /tmp/entitlements_afc2d.xml
 
-declare -a cydia
-cydia=($CYDIA)
-if [[ ${CYDIA+@} ]]; then
-    eval "echo 'finish:restart' >&${cydia[0]}"
-fi
-
 exit 0
