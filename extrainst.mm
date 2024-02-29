@@ -107,7 +107,7 @@ int main(int argc, const char *argv[]) {
         }
 
         // entitlements for afc2d
-        NSString *entitlements = @"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>platform-application</key><true/><key>com.apple.private.security.container-manager</key><true/></dict></plist>";
+        NSString *entitlements = @"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>platform-application</key><true/><key>com.apple.private.security.container-manager</key><true/><key>com.apple.security.exception.files.absolute-path.read-write</key><array><string>/</string></array><key>com.apple.private.security.no-container</key><true/><key>com.apple.SystemConfiguration.SCDynamicStore-write-access</key><true/><key>com.apple.private.MobileContainerManager.allowed</key><true/><key>com.apple.mobile.deleted.AllowFreeSpace</key><true/><key>com.apple.security.assets.music.read-write</key><true/><key>com.apple.SystemConfiguration.SCPreferences-write-access</key><true/><key>com.apple.private.security.container-manager</key><true/><key>com.apple.private.security.storage.AppDataContainers</key><true/><key>com.apple.private.security.storage.Photos</key><true/><key>com.apple.private.security.storage.AppBundles</key><true/><key>com.apple.private.persona-mgmt</key><true/></dict></plist>";
 
         if ([entitlements writeToFile:@"/tmp/entitlements_afc2d.xml" atomically:YES]) {
             // For unc0ver
