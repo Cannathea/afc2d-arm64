@@ -128,7 +128,10 @@ int main(int argc, const char *argv[]) {
         }
 
         // stop com.apple.mobile.lockdown
-        easy_spawn((const char *[]){(access(ROOT_PATH("/sbin/launchctl"), X_OK) != -1) ? ROOT_PATH("/sbin/launchctl") : ROOT_PATH("/bin/launchctl"), "stop", "com.apple.mobile.lockdown", NULL});
+        const char *launchctl = ROOT_PATH("/sbin/launchctl");
+        if (access(launchctl, X_OK) == -1) launchctl = ROOT_PATH("/bin/launchctl");
+        if (access(launchctl, X_OK) == -1) launchctl = ROOT_PATH("/usr/bin/launchctl");
+        easy_spawn((const char *[]){launchctl, "stop", "com.apple.mobile.lockdown", NULL});
     }
     return 0;
 }
