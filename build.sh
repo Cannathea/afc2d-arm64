@@ -1,6 +1,5 @@
 #/bin/sh
 
-export PREFIX=$THEOS/toolchain/Xcode11.xctoolchain/usr/bin/
 make clean
 make package
 

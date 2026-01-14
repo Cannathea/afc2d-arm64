@@ -3,9 +3,12 @@ FINALPACKAGE = 1
 
 ARCHS = arm64 arm64e
 
+THEOS_DEVICE_IP = 192.168.0.13
+
 ifeq ($(THEOS_PACKAGE_SCHEME),rootless)
 TARGET = iphone:16.5:15.0
 else
+export PREFIX = $(THEOS)/toolchain/Xcode11.xctoolchain/usr/bin/
 TARGET = iphone:14.5:11.0
 endif
 
