@@ -28,3 +28,53 @@ Some AFC2 setups, in particular many that were installed by default with older j
 Installing this package will correct that mistake, and is thereby more secure than the "stock" from-jailbreak AFC2 configuration you may be using now.
 
 AFC2 is GPLv3-licensed. See `LICENSE` for more information.
+## Building
+
+This project is built with [Theos](https://theos.dev/).
+
+### Prerequisites
+
+- Theos installed (for example at `~/theos`)
+- `ldid` and `xz` installed on the build machine
+- iOS SDKs installed via Theos (for rootless builds, latest is sufficient)
+
+### Environment setup
+
+Set `THEOS` before building:
+
+```sh
+export THEOS=~/theos
+```
+
+### Build commands
+
+Build rootful package:
+
+```sh
+make clean
+make package
+```
+
+Build rootless package:
+
+```sh
+make clean
+make package THEOS_PACKAGE_SCHEME=rootless
+```
+
+Build both (using the included script):
+
+```sh
+sh build.sh
+```
+
+### Output
+
+Generated packages are written to:
+
+- `packages/*.deb`
+
+### Notes
+
+- Current rootful settings in `Makefile` target `iphone:14.5:11.0` and use `$(THEOS)/toolchain/Xcode11.xctoolchain/usr/bin/`.
+- If your local Theos install does not include that SDK/toolchain layout, rootful packaging may fail while rootless packaging still succeeds.

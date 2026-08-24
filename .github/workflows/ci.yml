@@ -1,0 +1,66 @@
+name: Build and Validate
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build-rootless:
+    runs-on: macos-latest
+    env:
+      THEOS: ${{ github.workspace }}/theos
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install ldid xz
+
+      - name: Install Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git "$THEOS"
+
+      - name: Install SDK
+        run: |
+          "$THEOS/bin/install-sdk" latest
+
+      - name: Build rootless package
+        run: |
+          make clean
+          make package THEOS_PACKAGE_SCHEME=rootless
+
+      - name: Validate package contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          debs=(packages/*.deb)
+          if [[ ${#debs[@]} -eq 0 ]]; then
+            echo "No .deb artifacts found in packages/"
+            exit 1
+          fi
+          deb="${debs[0]}"
+          echo "Validating artifact: $deb"
+
+          tmpdir="$(mktemp -d)"
+          trap 'rm -rf "$tmpdir"' EXIT
+          cp "$deb" "$tmpdir/pkg.deb"
+          cd "$tmpdir"
+
+          data_member="$(ar -t pkg.deb | awk '/^data\.tar\./ {print; exit}')"
+          if [[ -z "$data_member" ]]; then
+            echo "Could not find data archive inside package"
+            exit 1
+          fi
+
+          ar -x pkg.deb "$data_member"
+          tar -tf "$data_member" | grep -Fx "var/jb/usr/libexec/afc2d"
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: afc2d-rootless-deb
+          path: packages/*.deb

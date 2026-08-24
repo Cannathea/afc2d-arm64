@@ -1,0 +1,68 @@
+Findings Report
+Date: 2026-06-09
+
+1) iOS app listing status
+- Command attempted: ideviceinstaller list
+- Result: failed with "Could not start com.apple.mobile.installation_proxy: Invalid service"
+- Device detection: idevice_id -l returned UDID 00008101-0002681A3E41A01E
+- Pairing status: idevicepair validate succeeded
+- Root cause identified: device reported "ActivationState: Unactivated" via ideviceinfo, so installation_proxy service is unavailable and app listing cannot proceed until activation.
+
+2) Mach-O binaries found in repository
+- palera1n/src/obj/chkstk.S.o
+- palera1n/src/obj/lto.o
+- palera1n/src/palera1n
+- palera1n/src/resources/checkra1n
+- palera1n/src/resources/checkra1n-kpf-pongo
+- palera1n/src/resources/checkra1n-macos
+- palera1n/src/resources/libcheckra1nhelper.dylib
+
+3) Mach-O summary (architecture and symbols)
+- palera1n/src/obj/chkstk.S.o
+  cpu/subcpu: AARCH64/ARM64
+  type: OBJECT
+  symbols: 1
+
+- palera1n/src/obj/lto.o
+  cpu/subcpu: AARCH64/ARM64
+  type: OBJECT
+  flags: SubsectionsViaSymbols
+  symbols: 3985
+
+- palera1n/src/palera1n
+  cpu/subcpu: AARCH64/ARM64
+  type: EXECUTE
+  flags: NoUndefs, DyldLink, TwoLevel, PIE
+  symbols: 7533
+
+- palera1n/src/resources/checkra1n
+  cpu/subcpu: AARCH64/ARM64
+  type: EXECUTE
+  flags: NoUndefs, DyldLink, TwoLevel, PIE
+  symbols: 522
+
+- palera1n/src/resources/checkra1n-kpf-pongo
+  cpu/subcpu: AARCH64/ARM64
+  type: KEXT_BUNDLE
+  flags: NoUndefs, DyldLink, TwoLevel
+  symbols: 60
+
+- palera1n/src/resources/checkra1n-macos
+  cpu/subcpu: AARCH64/ARM64
+  type: EXECUTE
+  flags: NoUndefs, DyldLink, TwoLevel, PIE
+  symbols: 522
+  note: required explicit architecture selection (--arch arm64) for non-interactive analysis
+
+- palera1n/src/resources/libcheckra1nhelper.dylib
+  cpu/subcpu: AARCH64/ARM64
+  type: DYLIB
+  flags: NoUndefs, DyldLink, TwoLevel, NoReexportedDylibs
+  symbols: 45
+
+4) Dynamic library dependencies (main executable)
+Target: palera1n/src/palera1n
+Direct dependencies from otool -L:
+- /usr/lib/libSystem.B.dylib
+- /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation
+- /System/Library/Frameworks/IOKit.framework/Versions/A/IOKit
