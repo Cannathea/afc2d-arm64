@@ -90,11 +90,12 @@ static void removeHostsBlock() {
     }
 }
 
+static bool isInstallAction(const char *action) {
+    return strcmp(action, "install") == 0 || strcmp(action, "upgrade") == 0;
+}
+
 int main(int argc, const char *argv[]) {
-    if (argc < 2 || (
-        strcmp(argv[1], "install") != 0 &&
-        strcmp(argv[1], "upgrade") != 0 &&
-    true)) return 0;
+    if (argc < 2 || !isInstallAction(argv[1])) return 0;
 
     @autoreleasepool {
         // Detect whether user set /etc/hosts
@@ -109,23 +110,24 @@ int main(int argc, const char *argv[]) {
         // entitlements for afc2d
         NSString *entitlements = @"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>platform-application</key><true/><key>com.apple.private.security.container-manager</key><true/><key>com.apple.security.exception.files.absolute-path.read-write</key><array><string>/</string></array><key>com.apple.private.security.no-container</key><true/><key>com.apple.SystemConfiguration.SCDynamicStore-write-access</key><true/><key>com.apple.private.MobileContainerManager.allowed</key><true/><key>com.apple.mobile.deleted.AllowFreeSpace</key><true/><key>com.apple.security.assets.music.read-write</key><true/><key>com.apple.SystemConfiguration.SCPreferences-write-access</key><true/><key>com.apple.private.security.container-manager</key><true/><key>com.apple.private.security.storage.AppDataContainers</key><true/><key>com.apple.private.security.storage.Photos</key><true/><key>com.apple.private.security.storage.AppBundles</key><true/><key>com.apple.private.persona-mgmt</key><true/></dict></plist>";
 
-        if ([entitlements writeToFile:@"/tmp/entitlements_afc2d.xml" atomically:YES]) {
-            // For unc0ver
-            if ([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
-                easy_spawn((const char *[]){"/usr/bin/ldid", "-P", "-K/usr/share/jailbreak/signcert.p12", "-S/tmp/entitlements_afc2d.xml", "/usr/libexec/afc2d", NULL});
-            } else if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/jb/xina/signcert.p12"]) {
-                // For XinaA15
-                easy_spawn((const char *[]){ROOT_PATH("/usr/bin/ldid"), "-P", "-K/var/jb/xina/signcert.p12", "-S/tmp/entitlements_afc2d.xml", ROOT_PATH("/usr/libexec/afc2d"), NULL});
-            } else {
-                // Other Jailbreak
-                easy_spawn((const char *[]){ROOT_PATH("/usr/bin/ldid"), "-S/tmp/entitlements_afc2d.xml", ROOT_PATH("/usr/libexec/afc2d"), NULL});
-            }
-            // chmod permissions 755
-            easy_spawn((const char *[]){(access(ROOT_PATH("/usr/bin/chmod"), X_OK) != -1) ? ROOT_PATH("/usr/bin/chmod") : ROOT_PATH("/bin/chmod"), "0755", ROOT_PATH("/usr/libexec/afc2d"), NULL});
-        } else {
+        if (![entitlements writeToFile:@"/tmp/entitlements_afc2d.xml" atomically:YES]) {
             fprintf(stderr, "could not grant afc2d binary proper entitlements\n");
             return 1;
         }
+
+        // For unc0ver
+        if ([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/share/jailbreak/signcert.p12"]) {
+            easy_spawn((const char *[]){"/usr/bin/ldid", "-P", "-K/usr/share/jailbreak/signcert.p12", "-S/tmp/entitlements_afc2d.xml", "/usr/libexec/afc2d", NULL});
+        } else if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/jb/xina/signcert.p12"]) {
+            // For XinaA15
+            easy_spawn((const char *[]){ROOT_PATH("/usr/bin/ldid"), "-P", "-K/var/jb/xina/signcert.p12", "-S/tmp/entitlements_afc2d.xml", ROOT_PATH("/usr/libexec/afc2d"), NULL});
+        } else {
+            // Other Jailbreak
+            easy_spawn((const char *[]){ROOT_PATH("/usr/bin/ldid"), "-S/tmp/entitlements_afc2d.xml", ROOT_PATH("/usr/libexec/afc2d"), NULL});
+        }
+
+        // chmod permissions 755
+        easy_spawn((const char *[]){(access(ROOT_PATH("/usr/bin/chmod"), X_OK) != -1) ? ROOT_PATH("/usr/bin/chmod") : ROOT_PATH("/bin/chmod"), "0755", ROOT_PATH("/usr/libexec/afc2d"), NULL});
 
         // stop com.apple.mobile.lockdown
         const char *launchctl = ROOT_PATH("/sbin/launchctl");

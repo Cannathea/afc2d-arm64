@@ -9,6 +9,8 @@ on:
 jobs:
   build-rootless:
     runs-on: macos-latest
+    permissions:
+      contents: read
     env:
       THEOS: ${{ github.workspace }}/theos
     steps:
@@ -24,6 +26,8 @@ jobs:
           git clone --recursive https://github.com/theos/theos.git "$THEOS"
 
       - name: Install SDK
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           "$THEOS/bin/install-sdk" latest
 

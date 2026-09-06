@@ -26,18 +26,18 @@
 
 %hookf(CFPropertyListRef, CFPropertyListCreateWithData, CFAllocatorRef allocator, CFDataRef data, CFOptionFlags options, CFPropertyListFormat *format, CFErrorRef *error)
 {
-    NSDictionary *origDict = (NSDictionary *)CFBridgingRelease(%orig);
+    CFPropertyListRef originalPropertyList = %orig;
+    NSDictionary *propertyList = (NSDictionary *)CFBridgingRelease(originalPropertyList);
 
-    if ([origDict isKindOfClass:[NSDictionary class]] && origDict[@"com.apple.afc"])
-    {
-        NSMutableDictionary *mDict = [origDict mutableCopy];
-        mDict[@"com.apple.afc2"] = @{
-            @"AllowUnactivatedService": @true,
-            @"Label": @"com.apple.afc2",
-            @"ProgramArguments": @[ROOT_PATH_NS(@"/usr/libexec/afc2d"), @"-S", @"-L", @"-d", @"/"],
-        };
-        return CFBridgingRetain(mDict);
+    if (![propertyList isKindOfClass:[NSDictionary class]] || !propertyList[@"com.apple.afc"]) {
+        return CFBridgingRetain(propertyList);
     }
 
-    return (CFPropertyListRef)CFBridgingRetain(origDict);
+    NSMutableDictionary *services = [propertyList mutableCopy];
+    services[@"com.apple.afc2"] = @{
+        @"AllowUnactivatedService": @true,
+        @"Label": @"com.apple.afc2",
+        @"ProgramArguments": @[ROOT_PATH_NS(@"/usr/libexec/afc2d"), @"-S", @"-L", @"-d", @"/"],
+    };
+    return CFBridgingRetain(services);
 }
